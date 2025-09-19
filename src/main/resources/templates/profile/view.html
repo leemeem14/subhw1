@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>내 프로필 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header text-center">
+          <h5 class="mb-0">프로필 정보</h5>
+        </div>
+        <div class="card-body text-center">
+          <div class="mb-3">
+            <img th:if="${user.profileImage != null}" th:src="@{${user.profileImage}}"
+                 class="rounded-circle img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;"
+                 alt="프로필 이미지">
+            <div th:unless="${user.profileImage != null}" class="bg-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                 style="width: 120px; height: 120px;">
+              <i class="fas fa-user fa-3x text-white"></i>
+            </div>
+          </div>
+          <h4 th:text="${user.realName}">실명</h4>
+          <p class="text-muted" th:text="${user.username}">사용자명</p>
+          <span class="badge" th:classappend="${user.role == 'ADMIN'} ? 'bg-danger' : (${user.role == 'TEACHER'} ? 'bg-success' : 'bg-primary')"
+                th:text="${user.role == 'ADMIN'} ? '관리자' : (${user.role == 'TEACHER'} ? '교사' : '학생')">역할</span>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h6 class="mb-0">계정 관리</h6>
+        </div>
+        <div class="list-group list-group-flush">
+          <a href="/profile/edit" class="list-group-item list-group-item-action">
+            <i class="fas fa-edit me-2"></i>프로필 수정
+          </a>
+          <a href="/profile/change-password" class="list-group-item list-group-item-action">
+            <i class="fas fa-key me-2"></i>비밀번호 변경
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">상세 정보</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-2"><strong>이메일:</strong></p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-2" th:text="${user.email}">이메일</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-2"><strong>전화번호:</strong></p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-2" th:text="${user.phoneNumber ?: '등록되지 않음'}">전화번호</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-2"><strong>가입일:</strong></p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-2" th:text="${#temporals.format(user.createdAt, 'yyyy년 MM월 dd일')}">가입일</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 최근 작성한 게시글 -->
+      <div class="card mt-4" th:if="${recentPosts != null and not #lists.isEmpty(recentPosts.content)}">
+        <div class="card-header">
+          <h5 class="mb-0">최근 작성한 게시글</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <div th:each="post : ${recentPosts.content}" class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">
+                <a th:href="@{/posts/{id}(id=${post.id})}" class="text-decoration-none" th:text="${post.title}">제목</a>
+              </h6>
+              <small th:text="${#temporals.format(post.createdAt, 'MM-dd')}">날짜</small>
+            </div>
+            <p class="mb-1 text-muted" th:text="${#strings.abbreviate(post.content, 50)}">내용 미리보기</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

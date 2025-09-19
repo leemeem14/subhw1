@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layout}">
+<head>
+  <title>대시보드 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="mb-4">
+        <i class="fas fa-tachometer-alt me-2"></i>대시보드
+        <small class="text-muted ms-2" sec:authentication="principal.realName"></small>
+      </h2>
+    </div>
+  </div>
+
+  <!-- 사용자별 다른 대시보드 -->
+  <div sec:authorize="hasRole('STUDENT')">
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4>과제 확인</h4>
+                <p class="mb-0">새로운 과제를 확인하고 제출하세요</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-tasks fa-2x"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/posts" class="card-footer text-white text-decoration-none">
+            더 보기 <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4>내 프로필</h4>
+                <p class="mb-0">프로필 정보를 관리하세요</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-user fa-2x"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/profile" class="card-footer text-white text-decoration-none">
+            더 보기 <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div sec:authorize="hasAnyRole('TEACHER', 'ADMIN')">
+    <div class="row">
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-primary text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4>새 과제</h4>
+                <p class="mb-0">새로운 과제를 등록하세요</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-plus fa-2x"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/posts/create" class="card-footer text-white text-decoration-none">
+            과제 등록 <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-success text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4>과제 관리</h4>
+                <p class="mb-0">등록된 과제들을 관리하세요</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-list fa-2x"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/posts" class="card-footer text-white text-decoration-none">
+            과제 보기 <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card bg-info text-white">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4>프로필</h4>
+                <p class="mb-0">내 정보를 관리하세요</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-user-cog fa-2x"></i>
+              </div>
+            </div>
+          </div>
+          <a href="/profile" class="card-footer text-white text-decoration-none">
+            프로필 보기 <i class="fas fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 최근 활동 -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-clock me-2"></i>빠른 액세스
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <a href="/posts" class="btn btn-outline-primary w-100">
+                <i class="fas fa-list me-2"></i>모든 게시글 보기
+              </a>
+            </div>
+            <div class="col-md-4 mb-3">
+              <a href="/profile" class="btn btn-outline-success w-100">
+                <i class="fas fa-user me-2"></i>내 프로필
+              </a>
+            </div>
+            <div class="col-md-4 mb-3" sec:authorize="hasAnyRole('TEACHER', 'ADMIN')">
+              <a href="/posts/create" class="btn btn-outline-info w-100">
+                <i class="fas fa-plus me-2"></i>새 게시글 작성
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>홈 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="jumbotron bg-primary text-white rounded p-5 mb-4">
+    <div class="text-center">
+      <h1 class="display-4 fw-bold">
+        <i class="fas fa-graduation-cap me-3"></i>
+        과제 제출 시스템
+      </h1>
+      <p class="lead">효율적인 과제 관리와 제출을 위한 통합 플랫폼</p>
+      <hr class="my-4" style="border-color: rgba(255,255,255,0.3);">
+      <div sec:authorize="isAnonymous()">
+        <a class="btn btn-light btn-lg me-3" href="/login" role="button">
+          <i class="fas fa-sign-in-alt me-2"></i>로그인
+        </a>
+        <a class="btn btn-outline-light btn-lg" href="/register" role="button">
+          <i class="fas fa-user-plus me-2"></i>회원가입
+        </a>
+      </div>
+      <div sec:authorize="isAuthenticated()">
+        <a class="btn btn-light btn-lg me-3" href="/dashboard" role="button">
+          <i class="fas fa-tachometer-alt me-2"></i>대시보드
+        </a>
+        <a class="btn btn-outline-light btn-lg" href="/posts" role="button">
+          <i class="fas fa-list me-2"></i>게시글 보기
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+          <h5 class="card-title">파일 제출</h5>
+          <p class="card-text">과제를 쉽고 빠르게 제출하고 관리할 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-comments fa-3x text-success mb-3"></i>
+          <h5 class="card-title">실시간 소통</h5>
+          <p class="card-text">댓글 시스템을 통해 실시간으로 소통하고 피드백을 받을 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-user-cog fa-3x text-warning mb-3"></i>
+          <h5 class="card-title">프로필 관리</h5>
+          <p class="card-text">개인 프로필을 관리하고 과제 제출 현황을 확인할 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+
+<!-- src/main/resources/templates/posts/view.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layout}">
+<head>
+  <title th:text="${post.title} + ' - 과제 제출 시스템'">게시글 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <!-- 게시글 정보 -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+                    <span class="badge me-2" th:classappend="${post.type == 'ASSIGNMENT'} ? 'bg-primary' : (${post.type == 'NOTICE'} ? 'bg-warning' : 'bg-secondary')">
+                        <span th:if="${post.type == 'ASSIGNMENT'}">과제</span>
+                        <span th:if="${post.type == 'NOTICE'}">공지</span>
+                        <span th:if="${post.type == 'GENERAL'}">일반</span>
+                    </span>
+          <h3 class="d-inline" th:text="${post.title}">게시글 제목</h3>
+        </div>
+        <div class="dropdown" th:if="${post.author.username == #authentication.principal.username or #authorization.expression('hasRole(''ADMIN'')')}">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-cog"></i>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" th:href="@{/posts/{id}/edit(id=${post.id})}">
+              <i class="fas fa-edit me-2"></i>수정
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post"
+                    onsubmit="return confirm('정말 삭제하시겠습니까?')" class="d-inline">
+                <button type="submit" class="dropdown-item text-danger">
+                  <i class="fas fa-trash me-2"></i>삭제
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-2">
+        <small class="text-muted">
+          <i class="fas fa-user me-1"></i><span th:text="${post.author.realName}">작성자</span>
+          <i class="fas fa-clock ms-3 me-1"></i><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성시간</span>
+          <span th:if="${post.updatedAt != null}" class="ms-3">
+                        <i class="fas fa-edit me-1"></i><span th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">수정시간</span>
+                    </span>
+        </small>
+        <div th:if="${post.dueDate != null}" class="mt-2">
+                    <span class="badge bg-danger">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        마감일: <span th:text="${#temporals.format(post.dueDate, 'yyyy-MM-dd HH:mm')}">마감일</span>
+                    </span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="post-content" th:utext="${#strings.replace(post.content, T(java.lang.System).lineSeparator(), '&lt;br&gt;')}">
+        게시글 내용
+      </div>
+    </div>
+  </div>
+
+  <!-- 첨부 파일 (교사/관리자가 올린 자료) -->
+  <div th:if="${files != null and not #lists.isEmpty(files)}" class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-paperclip me-2"></i>첨부 파일</h5>
+    </div>
+    <div class="card-body">
+      <div class="list-group list-group-flush">
+        <div th:each="file : ${files}" class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <i class="fas fa-file me-2"></i>
+            <span th:text="${file.originalFileName}">파일명</span>
+            <small class="text-muted ms-2">
+              (<span th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1)}">0</span> KB)
+            </small>
+          </div>
+          <a th:href="@{/files/download/{id}(id=${file.id})}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-download me-1"></i>다운로드
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 파일 제출 (학생용) -->
+  <div sec:authorize="hasRole('STUDENT')" class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-upload me-2"></i>과제 제출</h5>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/posts/{id}/submit(id=${post.id})}" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="files" class="form-label">파일 선택 (다중 선택 가능)</label>
+          <input type="file" class="form-control" id="files" name="files" multiple>
+          <small class="form-text text-muted">최대 10MB까지 업로드 가능합니다.</small>
+        </div>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-upload me-2"></i>파일 제출
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 내가 제출한 파일 (학생용) -->
+  <div th:if="${userFiles != null and not #lists.isEmpty(userFiles)}" sec:authorize="hasRole('STUDENT')" class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>내가 제출한 파일</h5>
+    </div>
+    <div class="card-body">
+      <div class="list-group list-group-flush">
+        <div th:each="file : ${userFiles}" class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <i class="fas fa-file-check me-2 text-success"></i>
+            <span th:text="${file.originalFileName}">파일명</span>
+            <small class="text-muted ms-2">
+              (<span th:text="${#temporals.format(file.uploadedAt, 'MM-dd HH:mm')}">제출시간</span>)
+            </small>
+          </div>
+          <div>
+            <a th:href="@{/files/download/{id}(id=${file.id})}" class="btn btn-sm btn-outline-primary me-2">
+              <i class="fas fa-download me-1"></i>다운로드
+            </a>
+            <form th:action="@{/files/{id}/delete(id=${file.id})}" method="post" class="d-inline"
+                  onsubmit="return confirm('정말 삭제하시겠습니까?')">
+              <input type="hidden" name="postId" th:value="${post.id}">
+              <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="fas fa-trash me-1"></i>삭제
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 댓글 섹션 -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="fas fa-comments me-2"></i>
+        댓글 <span class="badge bg-secondary" th:text="${#lists.size(comments)}">0</span>
+      </h5>
+    </div>
+    <div class="card-body">
+      <!-- 댓글 목록 -->
+      <div th:if="${comments != null and not #lists.isEmpty(comments)}" class="mb-4">
+        <div th:each="comment : ${comments}" class="border-bottom pb-3 mb-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-center mb-2">
+                <strong th:text="${comment.author.realName}">작성자</strong>
+                <small class="text-muted ms-2">
+                  <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">작성시간</span>
+                  <span th:if="${comment.updatedAt != null}"> (수정됨)</span>
+                </small>
+              </div>
+              <p class="mb-0" th:utext="${#strings.replace(comment.content, T(java.lang.System).lineSeparator(), '&lt;br&gt;')}">
+                댓글 내용
+              </p>
+            </div>
+            <div th:if="${comment.author.username == #authentication.principal.username or #authorization.expression('hasRole(''ADMIN'')')}" class="dropdown">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-ellipsis-h"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <form th:action="@{/comments/{id}/delete(id=${comment.id})}" method="post" class="d-inline"
+                        onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                    <input type="hidden" name="postId" th:value="${post.id}">
+                    <button type="submit" class="dropdown-item text-danger">
+                      <i class="fas fa-trash me-2"></i>삭제
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 댓글 작성 폼 -->
+      <form th:action="@{/comments/create}" th:object="${newComment}" method="post">
+        <input type="hidden" name="postId" th:value="${post.id}">
+        <div class="mb-3">
+          <label for="content" class="form-label">새 댓글</label>
+          <textarea class="form-control" id="content" th:field="*{content}" rows="3" placeholder="댓글을 입력하세요..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-comment me-2"></i>댓글 작성
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 네비게이션 -->
+  <div class="mt-4">
+    <a href="/posts" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>목록으로 돌아가기
+    </a>
+  </div>
+</div>
+</body>
+</html>

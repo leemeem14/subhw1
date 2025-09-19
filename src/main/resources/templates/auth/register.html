@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>회원가입 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-header text-center bg-success text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>회원가입
+          </h4>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/register}" th:object="${user}" method="post">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="username" class="form-label">사용자명 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                <small class="form-text text-muted">3-20자 사이로 입력하세요</small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">이메일 <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="password" class="form-label">비밀번호 <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                <small class="form-text text-muted">최소 6자 이상 입력하세요</small>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="realName" class="form-label">실명 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="realName" th:field="*{realName}" required>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('realName')}" th:errors="*{realName}"></div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="phoneNumber" class="form-label">전화번호</label>
+                <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" placeholder="010-0000-0000">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="role" class="form-label">역할 <span class="text-danger">*</span></label>
+                <select class="form-select" id="role" th:field="*{role}" required>
+                  <option value="STUDENT">학생</option>
+                  <option value="TEACHER">교사</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>회원가입
+              </button>
+            </div>
+          </form>
+
+          <hr>
+          <div class="text-center">
+            <p class="mb-0">이미 계정이 있으신가요? <a href="/login">로그인</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>게시글 수정 - 과제 제출 시스템</title>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="fas fa-edit me-2"></i>게시글 수정
+          </h4>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/posts/{id}/edit(id=${postId})}" th:object="${post}" method="post">
+            <div class="row">
+              <div class="col-md-8 mb-3">
+                <label for="title" class="form-label">제목 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required
+                       placeholder="게시글 제목을 입력하세요">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label for="type" class="form-label">게시글 유형</label>
+                <select class="form-select" id="type" th:field="*{type}">
+                  <option value="ASSIGNMENT">과제</option>
+                  <option value="NOTICE">공지사항</option>
+                  <option value="GENERAL">일반</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="dueDate" class="form-label">마감일 (과제인 경우)</label>
+              <input type="datetime-local" class="form-control" id="dueDate" th:field="*{dueDate}">
+              <small class="form-text text-muted">과제가 아닌 경우 비워두세요</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="content" class="form-label">내용 <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="content" th:field="*{content}" rows="10" required
+                        placeholder="게시글 내용을 입력하세요"></textarea>
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+            </div>
+
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i>
+              <strong>참고:</strong> 첨부 파일을 수정하려면 게시글을 저장한 후 개별적으로 파일을 추가/삭제해주세요.
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a th:href="@{/posts/{id}(id=${postId})}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>취소
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-save me-2"></i>수정 완료
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script layout:fragment="scripts">
+  // 게시글 유형에 따라 마감일 필드 표시/숨김
+  document.getElementById('type').addEventListener('change', function() {
+    const dueDateGroup = document.getElementById('dueDate').closest('.mb-3');
+    if (this.value === 'ASSIGNMENT') {
+      dueDateGroup.style.display = 'block';
+    } else {
+      dueDateGroup.style.display = 'none';
+      document.getElementById('dueDate').value = '';
+    }
+  });
+
+  // 페이지 로드 시 초기 상태 설정
+  document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('type');
+    typeSelect.dispatchEvent(new Event('change'));
+  });
+</script>
+</body>
+</html>
