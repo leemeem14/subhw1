@@ -80,6 +80,4 @@ public class User implements UserDetails {
     }
 }
 
-enum Role {
-    STUDENT, TEACHER, ADMIN
-}
+

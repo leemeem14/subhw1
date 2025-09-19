@@ -49,7 +49,4 @@ public class AssignmentFile {
     private FileType fileType = FileType.SUBMISSION;
 }
 
-enum FileType {
-    ASSIGNMENT_MATERIAL, // 과제 자료
-    SUBMISSION          // 학생 제출물
-}
+
