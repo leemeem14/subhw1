@@ -2,12 +2,12 @@ package kr.ac.kopo.lyh.subhw.controller;
 
 import kr.ac.kopo.lyh.subhw.dto.CommentCreateDto;
 import kr.ac.kopo.lyh.subhw.dto.PostCreateDto;
-import kr.ac.kopo.lyh.subhw.FileType;
-import kr.ac.kopo.lyh.subhw.Post;
-import kr.ac.kopo.lyh.subhw.User;
-import kr.ac.kopo.lyh.subhw.CommentService;
-import kr.ac.kopo.lyh.subhw.FileService;
-import kr.ac.kopo.lyh.subhw.PostService;
+import kr.ac.kopo.lyh.subhw.entity.FileType;
+import kr.ac.kopo.lyh.subhw.entity.Post;
+import kr.ac.kopo.lyh.subhw.entity.User;
+import kr.ac.kopo.lyh.subhw.service.CommentService;
+import kr.ac.kopo.lyh.subhw.service.FileService;
+import kr.ac.kopo.lyh.subhw.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

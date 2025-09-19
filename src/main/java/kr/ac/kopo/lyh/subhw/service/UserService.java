@@ -1,8 +1,8 @@
 package kr.ac.kopo.lyh.subhw.service;
 
-import kr.ac.kopo.lyh.dto.UserRegistrationDto;
-import kr.ac.kopo.lyh.entity.User;
-import kr.ac.kopo.lyh.repository.UserRepository;
+import kr.ac.kopo.lyh.subhw.dto.UserRegistrationDto;
+import kr.ac.kopo.lyh.subhw.entity.User;
+import kr.ac.kopo.lyh.subhw.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
