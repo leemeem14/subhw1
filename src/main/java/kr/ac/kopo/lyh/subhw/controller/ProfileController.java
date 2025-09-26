@@ -1,11 +1,9 @@
 package kr.ac.kopo.lyh.subhw.controller;
 
 import kr.ac.kopo.lyh.subhw.entity.User;
-import kr.ac.kopo.lyh.subhw.service.PostService;
 import kr.ac.kopo.lyh.subhw.service.UserService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,38 +17,33 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ProfileController {
 
     private final UserService userService;
-    private final PostService postService;
 
     @GetMapping
-    public String profile(@AuthenticationPrincipal User currentUser, Model model) {
-        // 사용자의 최근 게시글 5개 가져오기
-        Pageable pageable = PageRequest.of(0, 5);
+    public String profile(Model model, @AuthenticationPrincipal User currentUser) {
         model.addAttribute("user", currentUser);
-        model.addAttribute("recentPosts", postService.getPostsByAuthor(currentUser, pageable));
         return "profile/view";
     }
 
     @GetMapping("/edit")
-    public String editProfileForm(@AuthenticationPrincipal User currentUser, Model model) {
+    public String editProfile(Model model, @AuthenticationPrincipal User currentUser) {
         model.addAttribute("user", currentUser);
         return "profile/edit";
     }
 
     @PostMapping("/edit")
-    public String editProfile(@RequestParam String realName,
+    public String updateProfile(@RequestParam @NotBlank String realName,
                               @RequestParam String phoneNumber,
                               @RequestParam(required = false) MultipartFile profileImage,
                               @AuthenticationPrincipal User currentUser,
                               RedirectAttributes redirectAttributes) {
-
         try {
             userService.updateProfile(currentUser.getId(), realName, phoneNumber, profileImage);
-            redirectAttributes.addFlashAttribute("success", "프로필이 업데이트되었습니다.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "프로필 업데이트 중 오류가 발생했습니다: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("success", "프로필이 수정되었습니다.");
+            return "redirect:/profile";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/profile/edit";
         }
-
-        return "redirect:/profile";
     }
 
     @GetMapping("/change-password")
@@ -59,19 +52,14 @@ public class ProfileController {
     }
 
     @PostMapping("/change-password")
-    public String changePassword(@RequestParam String currentPassword,
-                                 @RequestParam String newPassword,
-                                 @RequestParam String confirmPassword,
-                                 @AuthenticationPrincipal User currentUser,
-                                 RedirectAttributes redirectAttributes) {
+    public String changePassword(@RequestParam @NotBlank String currentPassword,
+                               @RequestParam @NotBlank String newPassword,
+                               @RequestParam @NotBlank String confirmPassword,
+                               @AuthenticationPrincipal User currentUser,
+                               RedirectAttributes redirectAttributes) {
 
         if (!newPassword.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "새 비밀번호가 일치하지 않습니다.");
-            return "redirect:/profile/change-password";
-        }
-
-        if (newPassword.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "비밀번호는 최소 6자 이상이어야 합니다.");
+            redirectAttributes.addFlashAttribute("error", "새 비밀번호와 확인이 일치하지 않습니다.");
             return "redirect:/profile/change-password";
         }
 

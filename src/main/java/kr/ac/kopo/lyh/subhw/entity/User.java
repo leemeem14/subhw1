@@ -45,6 +45,7 @@ public class User implements UserDetails {
     private String realName;
 
     private String phoneNumber;
+
     private String profileImage;
 
     @Enumerated(EnumType.STRING)
@@ -79,5 +80,3 @@ public class User implements UserDetails {
         return true;
     }
 }
-
-
