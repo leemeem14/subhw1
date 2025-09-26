@@ -9,30 +9,33 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "notices")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comment {
+public class Notice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "submission_id")
-    private Submission submission;
+    @JoinColumn(name = "course_id")
+    private Course course; // null이면 전체 공지
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
 
+    @Column(nullable = false, length = 200)
+    private String title;
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_feedback")
-    private Boolean isFeedback = false;
+    @Column(name = "is_important")
+    private Boolean isImportant = false;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

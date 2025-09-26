@@ -1,8 +1,6 @@
 package kr.ac.kopo.lyh.subhw.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 @Entity
 @Table(name = "users")
@@ -27,37 +25,46 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    @NotBlank(message = "사용자명은 필수입니다")
+    @Column(unique = true, nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false)
-    @NotBlank(message = "비밀번호는 필수입니다")
     private String password;
 
-    @Column(unique = true, nullable = false)
-    @Email(message = "올바른 이메일 형식이 아닙니다")
-    @NotBlank(message = "이메일은 필수입니다")
+    @Column(unique = true, nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
-    @NotBlank(message = "실명은 필수입니다")
-    private String realName;
-
-    private String phoneNumber;
-
-    private String profileImage;
-
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private Role role = Role.STUDENT;
+    @Column(nullable = false)
+    private Role role;
 
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Professor professor;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Student student;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // UserDetails Implementation
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -78,5 +85,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public enum Role {
+        PROFESSOR, STUDENT
     }
 }

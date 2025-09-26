@@ -6,6 +6,7 @@ plugins {
 
 group = 'com.assignment'
 version = '0.0.1-SNAPSHOT'
+
 java {
     sourceCompatibility = '17'
 }
@@ -21,15 +22,67 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    compileOnly 'org.projectlombok:lombok'
+
+    // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+
+    // Development Tools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // File Upload
+    implementation 'commons-fileupload:commons-fileupload:1.5'
+    implementation 'commons-io:commons-io:2.11.0'
+
+    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // JSON Web Token (선택사항)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Gradle Wrapper 설정
+wrapper {
+    gradleVersion = '8.4'
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+// JAR 빌드 설정
+jar {
+    enabled = false
+    archiveClassifier = ''
+}
+
+// Spring Boot JAR 설정
+bootJar {
+    enabled = true
+    archiveClassifier = ''
+    mainClass = 'com.assignment.system.AssignmentSystemApplication'
+}
+
+// 소스 인코딩 설정
+compileJava {
+    options.encoding = 'UTF-8'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
 }

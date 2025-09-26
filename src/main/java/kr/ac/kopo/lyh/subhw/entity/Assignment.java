@@ -7,38 +7,44 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "assignments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Comment {
+public class Assignment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "submission_id")
-    private Submission submission;
+    @JoinColumn(name = "course_id")
+    private Course course;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id")
-    private User author;
+    @Column(nullable = false, length = 200)
+    private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    private String description;
 
-    @Column(name = "is_feedback")
-    private Boolean isFeedback = false;
+    @Column(name = "max_score")
+    private Integer maxScore = 100;
+
+    @Column(name = "due_date", nullable = false)
+    private LocalDateTime dueDate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Submission> submissions;
 
     @PrePersist
     protected void onCreate() {

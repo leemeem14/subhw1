@@ -1,107 +1,122 @@
 package kr.ac.kopo.lyh.subhw.service;
 
-import kr.ac.kopo.lyh.subhw.dto.UserRegistrationDto;
+import kr.ac.kopo.lyh.subhw.dto.request.UserRegisterDTO;
+import kr.ac.kopo.lyh.subhw.dto.response.UserResponseDTO;
+import kr.ac.kopo.lyh.subhw.entity.Professor;
+import kr.ac.kopo.lyh.subhw.entity.Student;
 import kr.ac.kopo.lyh.subhw.entity.User;
+import kr.ac.kopo.lyh.subhw.repository.ProfessorRepository;
+import kr.ac.kopo.lyh.subhw.repository.StudentRepository;
 import kr.ac.kopo.lyh.subhw.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final ProfessorRepository professorRepository;
+    private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final String PROFILE_IMAGE_DIR = "uploads/profiles/";
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+    }
 
-    public User registerUser(UserRegistrationDto dto) {
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+    public UserResponseDTO register(UserRegisterDTO registerDTO) {
+        // 중복 검사
+        if (userRepository.existsByUsername(registerDTO.getUsername())) {
             throw new RuntimeException("이미 존재하는 사용자명입니다.");
         }
 
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (userRepository.existsByEmail(registerDTO.getEmail())) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
+        if (registerDTO.getRole() == User.Role.STUDENT && 
+            studentRepository.existsByStudentNumber(registerDTO.getStudentNumber())) {
+            throw new RuntimeException("이미 존재하는 학번입니다.");
+        }
+
+        // 사용자 생성
         User user = User.builder()
-                .username(dto.getUsername())
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .email(dto.getEmail())
-                .realName(dto.getRealName())
-                .phoneNumber(dto.getPhoneNumber())
-                .role(dto.getRole())
+                .username(registerDTO.getUsername())
+                .password(passwordEncoder.encode(registerDTO.getPassword()))
+                .email(registerDTO.getEmail())
+                .role(registerDTO.getRole())
                 .build();
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        // 역할별 추가 정보 저장
+        if (registerDTO.getRole() == User.Role.PROFESSOR) {
+            Professor professor = Professor.builder()
+                    .user(user)
+                    .department(registerDTO.getDepartment())
+                    .position(registerDTO.getPosition())
+                    .build();
+            professorRepository.save(professor);
+        } else if (registerDTO.getRole() == User.Role.STUDENT) {
+            Student student = Student.builder()
+                    .user(user)
+                    .studentNumber(registerDTO.getStudentNumber())
+                    .major(registerDTO.getMajor())
+                    .grade(registerDTO.getGrade())
+                    .build();
+            studentRepository.save(student);
+        }
+
+        return new UserResponseDTO(user);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public UserResponseDTO findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        return new UserResponseDTO(user);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public User updateProfile(Long userId, String realName, String phoneNumber, MultipartFile profileImage) {
-        User user = userRepository.findById(userId)
+    public UserResponseDTO findByUsername(String username) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        user.setRealName(realName);
-        user.setPhoneNumber(phoneNumber);
-
-        if (profileImage != null && !profileImage.isEmpty()) {
-            String profileImagePath = saveProfileImage(profileImage);
-            user.setProfileImage(profileImagePath);
-        }
-
-        return userRepository.save(user);
+        return new UserResponseDTO(user);
     }
 
-    private String saveProfileImage(MultipartFile file) {
-        try {
-            // 디렉토리 생성
-            Path uploadPath = Paths.get(PROFILE_IMAGE_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // 고유한 파일명 생성
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
-
-            // 파일 저장
-            Files.copy(file.getInputStream(), filePath);
-
-            return PROFILE_IMAGE_DIR + fileName;
-        } catch (IOException e) {
-            throw new RuntimeException("프로필 이미지 저장에 실패했습니다.", e);
-        }
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> findAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public void changePassword(Long userId, String currentPassword, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    @Transactional(readOnly = true)
+    public List<UserResponseDTO> findByRole(User.Role role) {
+        return userRepository.findByRole(role).stream()
+                .map(UserResponseDTO::new)
+                .collect(Collectors.toList());
+    }
 
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
-        }
+    @Transactional(readOnly = true)
+    public Optional<Professor> findProfessorByUsername(String username) {
+        return professorRepository.findByUsername(username);
+    }
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+    @Transactional(readOnly = true)
+    public Optional<Student> findStudentByUsername(String username) {
+        return studentRepository.findByUsername(username);
     }
 }
