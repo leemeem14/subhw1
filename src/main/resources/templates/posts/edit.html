@@ -1,88 +1,221 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>게시글 수정 - 과제 제출 시스템</title>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4F46E5;
+      --primary-dark: #3730A3;
+      --secondary-color: #10B981;
+      --danger-color: #EF4444;
+      --warning-color: #F59E0B;
+      --info-color: #06B6D4;
+      --light-bg: #F8FAFC;
+      --dark-text: #1E293B;
+      --medium-text: #64748B;
+      --border-color: #E2E8F0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    * { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background-color: var(--light-bg); color: var(--dark-text); line-height: 1.6; }
+
+    .navbar { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); box-shadow: var(--shadow-md); padding: 1rem 0; }
+    .navbar-brand { font-weight: 700; font-size: 1.5rem; color: white !important; }
+    .nav-link { color: rgba(255,255,255,.9) !important; border-radius: .5rem; padding: .5rem 1rem !important; }
+    .nav-link:hover { background: rgba(255,255,255,.1); color: #fff !important; }
+    .nav-link.active { background: rgba(255,255,255,.2); color: #fff !important; }
+    .btn-logout { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.3); color: #fff !important; }
+
+    .main-container { padding: 2rem 0; min-height: calc(100vh - 140px); }
+
+    .page-header { background: #fff; border-radius: 1rem; box-shadow: var(--shadow-sm); padding: 2rem; margin-bottom: 2rem; border: 1px solid var(--border-color); }
+    .page-title { font-size: 2rem; font-weight: 700; margin: 0; }
+
+    .form-card { background: #fff; border-radius: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); overflow: hidden; }
+    .form-card-header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: #fff; padding: 1.25rem 1.75rem; }
+    .form-card-body { padding: 2rem; }
+
+    .form-label { font-weight: 600; color: var(--dark-text); margin-bottom: .75rem; }
+    .required { color: var(--danger-color); }
+    .form-control, .form-select {
+      border: 2px solid var(--border-color); border-radius: .75rem; padding: .875rem 1rem; background: #FAFBFC; transition: all .2s ease;
+    }
+    .form-control:focus, .form-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 .2rem rgba(79,70,229,.1); background: #fff; }
+    textarea.form-control { min-height: 200px; resize: vertical; }
+
+    .type-selection { display: flex; gap: 1rem; }
+    .type-option { flex: 1; position: relative; }
+    .type-option input[type="radio"] { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .type-option label {
+      display: block; padding: 1rem; border: 2px solid var(--border-color); border-radius: .75rem; text-align: center; font-weight: 500; background: #FAFBFC; transition: all .2s;
+    }
+    .type-option input[type="radio"]:checked + label { border-color: var(--primary-color); background: rgba(79,70,229,.08); color: var(--primary-color); }
+    .type-option label i { display: block; font-size: 1.25rem; margin-bottom: .5rem; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      border: none; border-radius: .75rem; padding: .875rem 2rem; font-weight: 600; box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn-outline-secondary {
+      border: 2px solid var(--border-color); color: var(--medium-text); background: #fff; border-radius: .75rem; padding: .875rem 2rem; font-weight: 500;
+    }
+    .btn-outline-secondary:hover { background: var(--light-bg); color: var(--dark-text); }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 1.5rem; }
+      .form-card-body { padding: 1.5rem; }
+      .type-selection { flex-direction: column; gap: .75rem; }
+    }
+  </style>
 </head>
 <body>
-<div layout:fragment="content">
-  <div class="row justify-content-center">
-    <div class="col-md-10">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">
-            <i class="fas fa-edit me-2"></i>게시글 수정
-          </h4>
-        </div>
-        <div class="card-body">
-          <form th:action="@{/posts/{id}/edit(id=${postId})}" th:object="${post}" method="post">
-            <div class="row">
-              <div class="col-md-8 mb-3">
-                <label for="title" class="form-label">제목 <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" th:field="*{title}" required
-                       placeholder="게시글 제목을 입력하세요">
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label for="type" class="form-label">게시글 유형</label>
-                <select class="form-select" id="type" th:field="*{type}">
-                  <option value="ASSIGNMENT">과제</option>
-                  <option value="NOTICE">공지사항</option>
-                  <option value="GENERAL">일반</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="dueDate" class="form-label">마감일 (과제인 경우)</label>
-              <input type="datetime-local" class="form-control" id="dueDate" th:field="*{dueDate}">
-              <small class="form-text text-muted">과제가 아닌 경우 비워두세요</small>
-            </div>
-
-            <div class="mb-3">
-              <label for="content" class="form-label">내용 <span class="text-danger">*</span></label>
-              <textarea class="form-control" id="content" th:field="*{content}" rows="10" required
-                        placeholder="게시글 내용을 입력하세요"></textarea>
-              <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
-            </div>
-
-            <div class="alert alert-info">
-              <i class="fas fa-info-circle me-2"></i>
-              <strong>참고:</strong> 첨부 파일을 수정하려면 게시글을 저장한 후 개별적으로 파일을 추가/삭제해주세요.
-            </div>
-
-            <div class="d-flex justify-content-between">
-              <a th:href="@{/posts/{id}(id=${postId})}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>취소
-              </a>
-              <button type="submit" class="btn btn-success">
-                <i class="fas fa-save me-2"></i>수정 완료
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <i class="fas fa-graduation-cap me-2"></i>과제 제출 시스템
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="fas fa-home me-1"></i>홈</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/dashboard}"><i class="fas fa-tachometer-alt me-1"></i>대시보드</a></li>
+        <li class="nav-item"><a class="nav-link active" th:href="@{/posts}"><i class="fas fa-list-alt me-1"></i>게시글</a></li>
+      </ul>
+      <ul class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <i class="fas fa-user me-1"></i><span sec:authentication="name">사용자</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" th:href="@{/profile}"><i class="fas fa-user-circle me-2"></i>내 프로필</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" th:action="@{/logout}" class="d-inline">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout w-100 text-start">
+                  <i class="fas fa-sign-out-alt me-2"></i>로그아웃
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
-</div>
+</nav>
 
-<script layout:fragment="scripts">
-  // 게시글 유형에 따라 마감일 필드 표시/숨김
-  document.getElementById('type').addEventListener('change', function() {
-    const dueDateGroup = document.getElementById('dueDate').closest('.mb-3');
-    if (this.value === 'ASSIGNMENT') {
-      dueDateGroup.style.display = 'block';
-    } else {
-      dueDateGroup.style.display = 'none';
-      document.getElementById('dueDate').value = '';
+<main class="main-container">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-pen-to-square me-2" style="color: var(--primary-color);"></i>
+        게시글 수정
+      </h1>
+      <p class="text-muted mb-0">기존 게시글 내용을 수정한 뒤 저장하세요</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>수정 정보</h5>
+      </div>
+      <div class="form-card-body">
+        <form method="post"
+              th:action="@{'/posts/' + ${postId} + '/edit'}"
+              th:object="${post}">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+          <!-- 제목 -->
+          <div class="mb-4">
+            <label class="form-label" for="title">제목 <span class="required">*</span></label>
+            <input id="title" type="text" class="form-control" th:field="*{title}" placeholder="게시글 제목을 입력하세요" required>
+            <div class="text-danger mt-2" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+          </div>
+
+          <!-- 유형 -->
+          <div class="mb-4">
+            <label class="form-label">게시글 유형 <span class="required">*</span></label>
+            <div class="type-selection">
+              <div class="type-option">
+                <input id="type-assignment" type="radio" th:field="*{type}" value="ASSIGNMENT">
+                <label for="type-assignment"><i class="fas fa-tasks"></i>과제</label>
+              </div>
+              <div class="type-option">
+                <input id="type-notice" type="radio" th:field="*{type}" value="NOTICE">
+                <label for="type-notice"><i class="fas fa-bullhorn"></i>공지사항</label>
+              </div>
+              <div class="type-option">
+                <input id="type-general" type="radio" th:field="*{type}" value="GENERAL">
+                <label for="type-general"><i class="fas fa-comment"></i>일반</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 마감일 (과제인 경우) -->
+          <div class="mb-4" id="dueDateSection" th:style="${typeDisplayStyle}">
+            <label class="form-label" for="dueDate">마감일</label>
+            <input id="dueDate" type="datetime-local" class="form-control" th:field="*{dueDate}">
+            <div class="form-text">과제일 경우에만 설정합니다</div>
+          </div>
+
+          <!-- 내용 -->
+          <div class="mb-4">
+            <label class="form-label" for="content">내용 <span class="required">*</span></label>
+            <textarea id="content" class="form-control" th:field="*{content}" placeholder="게시글 내용을 입력하세요" required></textarea>
+            <div class="text-danger mt-2" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+          </div>
+
+          <!-- 버튼 -->
+          <div class="d-flex gap-3 justify-content-end">
+            <a class="btn btn-outline-secondary" th:href="@{'/posts/' + ${postId}}">
+              <i class="fas fa-arrow-left me-2"></i>취소
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>저장하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const assignmentValue = 'ASSIGNMENT';
+    const dueDateSection = document.getElementById('dueDateSection');
+    const typeRadios = document.querySelectorAll('input[name="type"]');
+
+    function toggleDueDate() {
+      const selected = Array.from(typeRadios).find(r => r.checked)?.value;
+      if (selected === assignmentValue) {
+        dueDateSection.style.display = 'block';
+      } else {
+        dueDateSection.style.display = 'none';
+        const dueInput = document.getElementById('dueDate');
+        if (dueInput) dueInput.value = '';
+      }
     }
-  });
 
-  // 페이지 로드 시 초기 상태 설정
-  document.addEventListener('DOMContentLoaded', function() {
-    const typeSelect = document.getElementById('type');
-    typeSelect.dispatchEvent(new Event('change'));
+    typeRadios.forEach(r => r.addEventListener('change', toggleDueDate));
+    toggleDueDate();
   });
 </script>
 </body>

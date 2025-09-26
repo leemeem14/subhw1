@@ -1,207 +1,903 @@
-
-<!-- src/main/resources/templates/posts/view.html -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-  <title th:text="${post.title} + ' - 과제 제출 시스템'">게시글 - 과제 제출 시스템</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${post.title + ' - 과제 제출 시스템'}">게시글 - 과제 제출 시스템</title>
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4F46E5;
+      --primary-dark: #3730A3;
+      --secondary-color: #10B981;
+      --danger-color: #EF4444;
+      --warning-color: #F59E0B;
+      --info-color: #06B6D4;
+      --light-bg: #F8FAFC;
+      --dark-text: #1E293B;
+      --medium-text: #64748B;
+      --border-color: #E2E8F0;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      color: var(--dark-text);
+      line-height: 1.6;
+    }
+
+    /* 네비게이션 스타일 */
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      box-shadow: var(--shadow-md);
+      padding: 1rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white !important;
+    }
+
+    .navbar-nav .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white !important;
+    }
+
+    .navbar-nav .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white !important;
+    }
+
+    .btn-logout {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white !important;
+      font-size: 0.9rem;
+      padding: 0.4rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: white !important;
+    }
+
+    /* 메인 컨테이너 */
+    .main-container {
+      padding: 2rem 0;
+      min-height: calc(100vh - 140px);
+    }
+
+    /* 게시글 헤더 */
+    .post-header {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .post-type-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    .post-type-badge.assignment {
+      background-color: #EEF2FF;
+      color: var(--primary-color);
+      border: 1px solid #C7D2FE;
+    }
+
+    .post-type-badge.notice {
+      background-color: #FEF3C7;
+      color: var(--warning-color);
+      border: 1px solid #FDE68A;
+    }
+
+    .post-type-badge.general {
+      background-color: #ECFDF5;
+      color: var(--secondary-color);
+      border: 1px solid #A7F3D0;
+    }
+
+    .post-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--dark-text);
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+    }
+
+    .post-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      color: var(--medium-text);
+      font-size: 1rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .post-meta-item i {
+      width: 20px;
+      text-align: center;
+      color: var(--primary-color);
+    }
+
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .btn-group .btn {
+      margin-right: 0.5rem;
+    }
+
+    /* 게시글 본문 */
+    .post-content-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .post-content-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-content-body {
+      padding: 2rem;
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    .post-content-body p {
+      margin-bottom: 1.5rem;
+    }
+
+    .post-content-body pre {
+      background-color: var(--light-bg);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    /* 마감일 알림 */
+    .due-date-alert {
+      background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
+      border: 1px solid var(--danger-color);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .due-date-alert.warning {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FED7AA 100%);
+      border-color: var(--warning-color);
+    }
+
+    .due-date-alert.safe {
+      background: linear-gradient(135deg, #ECFDF5 0%, #A7F3D0 100%);
+      border-color: var(--secondary-color);
+    }
+
+    .due-date-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+
+    /* 파일 섹션 */
+    .files-section {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .files-header {
+      background: linear-gradient(135deg, var(--info-color) 0%, #0891B2 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .files-body {
+      padding: 2rem;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background-color: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .file-item:hover {
+      background-color: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      color: white;
+    }
+
+    .file-details h6 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .file-size {
+      color: var(--medium-text);
+      font-size: 0.9rem;
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+      border: none;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+      color: white;
+    }
+
+    /* 제출 섹션 */
+    .submission-section {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+    }
+
+    .submission-header {
+      background: linear-gradient(135deg, var(--warning-color) 0%, #D97706 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .submission-body {
+      padding: 2rem;
+    }
+
+    .file-upload-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      background-color: var(--light-bg);
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-zone:hover {
+      border-color: var(--primary-color);
+      background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--medium-text);
+      margin-bottom: 1rem;
+    }
+
+    /* 댓글 섹션 */
+    .comments-section {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .comments-header {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+      color: white;
+      padding: 1.5rem 2rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+
+    .comments-body {
+      padding: 2rem;
+    }
+
+    .comment-item {
+      background-color: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .comment-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .comment-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+
+    .comment-content {
+      line-height: 1.6;
+    }
+
+    .comment-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .comment-form {
+      background-color: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .comment-form textarea {
+      border: 2px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    /* 버튼 스타일 */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-outline-primary {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      background: transparent;
+      border-radius: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+    }
+
+    .btn-outline-primary:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger-color) 0%, #DC2626 100%);
+      border: none;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+      border: none;
+    }
+
+    /* 빈 상태 */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--medium-text);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 1rem 0;
+      }
+
+      .post-header {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .post-title {
+        font-size: 1.8rem;
+      }
+
+      .post-meta {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .post-actions {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .post-content-body,
+      .files-body,
+      .submission-body,
+      .comments-body {
+        padding: 1.5rem;
+      }
+
+      .file-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
-<div layout:fragment="content">
-  <!-- 게시글 정보 -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-                    <span class="badge me-2" th:classappend="${post.type == 'ASSIGNMENT'} ? 'bg-primary' : (${post.type == 'NOTICE'} ? 'bg-warning' : 'bg-secondary')">
-                        <span th:if="${post.type == 'ASSIGNMENT'}">과제</span>
-                        <span th:if="${post.type == 'NOTICE'}">공지</span>
-                        <span th:if="${post.type == 'GENERAL'}">일반</span>
-                    </span>
-          <h3 class="d-inline" th:text="${post.title}">게시글 제목</h3>
-        </div>
-        <div class="dropdown" th:if="${post.author.username == #authentication.principal.username or #authorization.expression('hasRole(''ADMIN'')')}">
-          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            <i class="fas fa-cog"></i>
-          </button>
+<!-- 네비게이션 -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/" th:href="@{/}">
+      <i class="fas fa-graduation-cap me-2"></i>과제 제출 시스템
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/}">
+            <i class="fas fa-home me-1"></i>홈
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/dashboard}">
+            <i class="fas fa-tachometer-alt me-1"></i>대시보드
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" th:href="@{/posts}">
+            <i class="fas fa-list-alt me-1"></i>게시글
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user me-1"></i>
+            <span sec:authentication="name">사용자</span>
+          </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" th:href="@{/posts/{id}/edit(id=${post.id})}">
-              <i class="fas fa-edit me-2"></i>수정
-            </a></li>
+            <li>
+              <a class="dropdown-item" th:href="@{/profile}">
+                <i class="fas fa-user-circle me-2"></i>내 프로필
+              </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
             <li>
-              <form th:action="@{/posts/{id}/delete(id=${post.id})}" method="post"
-                    onsubmit="return confirm('정말 삭제하시겠습니까?')" class="d-inline">
-                <button type="submit" class="dropdown-item text-danger">
-                  <i class="fas fa-trash me-2"></i>삭제
+              <form method="post" th:action="@{/logout}" class="d-inline">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout w-100 text-start">
+                  <i class="fas fa-sign-out-alt me-2"></i>로그아웃
                 </button>
               </form>
             </li>
           </ul>
-        </div>
-      </div>
-      <div class="mt-2">
-        <small class="text-muted">
-          <i class="fas fa-user me-1"></i><span th:text="${post.author.realName}">작성자</span>
-          <i class="fas fa-clock ms-3 me-1"></i><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성시간</span>
-          <span th:if="${post.updatedAt != null}" class="ms-3">
-                        <i class="fas fa-edit me-1"></i><span th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">수정시간</span>
-                    </span>
-        </small>
-        <div th:if="${post.dueDate != null}" class="mt-2">
-                    <span class="badge bg-danger">
-                        <i class="fas fa-calendar-alt me-1"></i>
-                        마감일: <span th:text="${#temporals.format(post.dueDate, 'yyyy-MM-dd HH:mm')}">마감일</span>
-                    </span>
-        </div>
-      </div>
-    </div>
-    <div class="card-body">
-      <div class="post-content" th:utext="${#strings.replace(post.content, T(java.lang.System).lineSeparator(), '&lt;br&gt;')}">
-        게시글 내용
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
+</nav>
 
-  <!-- 첨부 파일 (교사/관리자가 올린 자료) -->
-  <div th:if="${files != null and not #lists.isEmpty(files)}" class="card mb-4">
-    <div class="card-header">
-      <h5 class="mb-0"><i class="fas fa-paperclip me-2"></i>첨부 파일</h5>
+<!-- 메인 컨텐츠 -->
+<div class="main-container">
+  <div class="container">
+    <!-- 게시글 헤더 -->
+    <div class="post-header">
+      <div class="post-type-badge"
+           th:classappend="${post.type == T(kr.ac.kopo.lyh.subhw.entity.PostType).ASSIGNMENT ? 'assignment' :
+                                     post.type == T(kr.ac.kopo.lyh.subhw.entity.PostType).NOTICE ? 'notice' : 'general'}">
+        <i class="fas fa-tag me-2"></i>
+        <span th:switch="${post.type}">
+                        <span th:case="${T(kr.ac.kopo.lyh.subhw.entity.PostType).ASSIGNMENT}">과제</span>
+                        <span th:case="${T(kr.ac.kopo.lyh.subhw.entity.PostType).NOTICE}">공지</span>
+                        <span th:case="*">일반</span>
+                    </span>
+      </div>
+
+      <h1 class="post-title" th:text="${post.title}">게시글 제목</h1>
+
+      <div class="post-meta">
+        <div class="post-meta-item">
+          <i class="fas fa-user"></i>
+          <span th:text="${post.author.realName}">작성자</span>
+        </div>
+        <div class="post-meta-item">
+          <i class="fas fa-clock"></i>
+          <span th:text="${#temporals.format(post.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">작성시간</span>
+        </div>
+        <div class="post-meta-item" th:if="${post.updatedAt != null}">
+          <i class="fas fa-edit"></i>
+          <span th:text="${#temporals.format(post.updatedAt, 'yyyy년 MM월 dd일 HH:mm')}">수정시간</span>
+        </div>
+        <div class="post-meta-item" th:if="${post.comments != null}">
+          <i class="fas fa-comments"></i>
+          <span th:text="${#lists.size(post.comments)} + '개 댓글'">댓글 수</span>
+        </div>
+      </div>
+
+      <div class="post-actions">
+        <div class="btn-group">
+          <a th:href="@{'/posts/' + ${post.id} + '/edit'}"
+             class="btn btn-outline-primary"
+             th:if="${post.author.username == #authentication.name}">
+            <i class="fas fa-edit me-2"></i>수정
+          </a>
+          <form method="post"
+                th:action="@{'/posts/' + ${post.id} + '/delete'}"
+                class="d-inline"
+                th:if="${post.author.username == #authentication.name}"
+                onsubmit="return confirm('정말 삭제하시겠습니까?')">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-trash me-2"></i>삭제
+            </button>
+          </form>
+        </div>
+        <a th:href="@{/posts}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i>목록으로 돌아가기
+        </a>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="list-group list-group-flush">
-        <div th:each="file : ${files}" class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <i class="fas fa-file me-2"></i>
-            <span th:text="${file.originalFileName}">파일명</span>
-            <small class="text-muted ms-2">
-              (<span th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1)}">0</span> KB)
-            </small>
+
+    <!-- 마감일 알림 -->
+    <div th:if="${post.dueDate != null}"
+         class="due-date-alert"
+         th:classappend="${#temporals.createNow().isBefore(post.dueDate) ?
+                                (#temporals.createNow().until(post.dueDate, 'DAYS') <= 3 ? 'warning' : 'safe') :
+                                ''}">
+      <div class="d-flex align-items-center">
+        <div class="due-date-icon">
+          <i class="fas fa-calendar-alt"
+             th:style="${#temporals.createNow().isAfter(post.dueDate) ? 'color: var(--danger-color);' :
+                                     #temporals.createNow().until(post.dueDate, 'DAYS') <= 3 ? 'color: var(--warning-color);' :
+                                     'color: var(--secondary-color);'}"></i>
+        </div>
+        <div>
+          <h5 class="mb-1"
+              th:style="${#temporals.createNow().isAfter(post.dueDate) ? 'color: var(--danger-color);' :
+                                      #temporals.createNow().until(post.dueDate, 'DAYS') <= 3 ? 'color: var(--warning-color);' :
+                                      'color: var(--secondary-color);'}">
+            <span th:if="${#temporals.createNow().isAfter(post.dueDate)}">마감일이 지났습니다</span>
+            <span th:if="${#temporals.createNow().isBefore(post.dueDate) and #temporals.createNow().until(post.dueDate, 'DAYS') <= 3}">곧 마감됩니다</span>
+            <span th:if="${#temporals.createNow().isBefore(post.dueDate) and #temporals.createNow().until(post.dueDate, 'DAYS') > 3}">제출 기한</span>
+          </h5>
+          <p class="mb-0">
+            <strong th:text="${#temporals.format(post.dueDate, 'yyyy년 MM월 dd일 HH:mm')}">마감일</strong>
+            <span th:if="${#temporals.createNow().isBefore(post.dueDate)}">
+                                (남은 시간: <span th:text="${#temporals.createNow().until(post.dueDate, 'DAYS')} + '일'">N일</span>)
+                            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 게시글 본문 -->
+    <div class="post-content-card">
+      <div class="post-content-header">
+        <h4><i class="fas fa-file-text me-2"></i>게시글 내용</h4>
+      </div>
+      <div class="post-content-body">
+        <div th:utext="${#strings.replace(#strings.escapeXml(post.content), T(java.lang.String).valueOf(T(java.lang.Character).valueOf('\n')), '&lt;br /&gt;')}">
+          게시글 내용
+        </div>
+      </div>
+    </div>
+
+    <!-- 첨부 파일 -->
+    <div th:if="${files != null and !#lists.isEmpty(files)}" class="files-section">
+      <div class="files-header">
+        <h4><i class="fas fa-paperclip me-2"></i>첨부 파일</h4>
+      </div>
+      <div class="files-body">
+        <div th:each="file : ${files}" class="file-item">
+          <div class="file-info">
+            <div class="file-icon">
+              <i class="fas fa-file"></i>
+            </div>
+            <div class="file-details">
+              <h6 th:text="${file.originalFileName}">파일명</h6>
+              <div class="file-size" th:text="${file.fileSize != null ? file.fileSize + ' KB' : '크기 정보 없음'}">파일 크기</div>
+            </div>
           </div>
-          <a th:href="@{/files/download/{id}(id=${file.id})}" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-download me-1"></i>다운로드
+          <a th:href="@{'/files/download/' + ${file.id}}" class="btn btn-download">
+            <i class="fas fa-download me-2"></i>다운로드
           </a>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 파일 제출 (학생용) -->
-  <div sec:authorize="hasRole('STUDENT')" class="card mb-4">
-    <div class="card-header">
-      <h5 class="mb-0"><i class="fas fa-upload me-2"></i>과제 제출</h5>
-    </div>
-    <div class="card-body">
-      <form th:action="@{/posts/{id}/submit(id=${post.id})}" method="post" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="files" class="form-label">파일 선택 (다중 선택 가능)</label>
-          <input type="file" class="form-control" id="files" name="files" multiple>
-          <small class="form-text text-muted">최대 10MB까지 업로드 가능합니다.</small>
-        </div>
-        <button type="submit" class="btn btn-success">
-          <i class="fas fa-upload me-2"></i>파일 제출
-        </button>
-      </form>
-    </div>
-  </div>
+    <!-- 과제 제출 (과제 타입인 경우) -->
+    <div th:if="${post.type == T(kr.ac.kopo.lyh.subhw.entity.PostType).ASSIGNMENT}" class="submission-section">
+      <div class="submission-header">
+        <h4><i class="fas fa-upload me-2"></i>과제 제출</h4>
+      </div>
+      <div class="submission-body">
+        <form method="post" th:action="@{'/posts/' + ${post.id} + '/submit'}" enctype="multipart/form-data">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-  <!-- 내가 제출한 파일 (학생용) -->
-  <div th:if="${userFiles != null and not #lists.isEmpty(userFiles)}" sec:authorize="hasRole('STUDENT')" class="card mb-4">
-    <div class="card-header">
-      <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>내가 제출한 파일</h5>
-    </div>
-    <div class="card-body">
-      <div class="list-group list-group-flush">
-        <div th:each="file : ${userFiles}" class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <i class="fas fa-file-check me-2 text-success"></i>
-            <span th:text="${file.originalFileName}">파일명</span>
-            <small class="text-muted ms-2">
-              (<span th:text="${#temporals.format(file.uploadedAt, 'MM-dd HH:mm')}">제출시간</span>)
-            </small>
+          <div class="file-upload-zone">
+            <input type="file" name="files" multiple class="form-control" id="submissionFiles" style="display: none;">
+            <div class="upload-icon">
+              <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h5>파일을 선택하여 제출하세요</h5>
+            <p class="text-muted">파일을 드래그하거나 클릭하여 선택하세요 (최대 10MB)</p>
+            <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('submissionFiles').click()">
+              <i class="fas fa-folder-open me-2"></i>파일 선택
+            </button>
           </div>
-          <div>
-            <a th:href="@{/files/download/{id}(id=${file.id})}" class="btn btn-sm btn-outline-primary me-2">
-              <i class="fas fa-download me-1"></i>다운로드
+
+          <div id="selectedSubmissionFiles"></div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fas fa-paper-plane me-2"></i>과제 제출
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 내가 제출한 파일 -->
+    <div th:if="${userFiles != null and !#lists.isEmpty(userFiles)}" class="files-section">
+      <div class="files-header" style="background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);">
+        <h4><i class="fas fa-check-circle me-2"></i>내가 제출한 파일</h4>
+      </div>
+      <div class="files-body">
+        <div th:each="file : ${userFiles}" class="file-item">
+          <div class="file-info">
+            <div class="file-icon" style="background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);">
+              <i class="fas fa-file-check"></i>
+            </div>
+            <div class="file-details">
+              <h6 th:text="${file.originalFileName}">파일명</h6>
+              <div class="file-size">
+                제출시간: <span th:text="${#temporals.format(file.uploadedAt, 'yyyy-MM-dd HH:mm')}">제출시간</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <a th:href="@{'/files/download/' + ${file.id}}" class="btn btn-download">
+              <i class="fas fa-download me-2"></i>다운로드
             </a>
-            <form th:action="@{/files/{id}/delete(id=${file.id})}" method="post" class="d-inline"
+            <form method="post"
+                  th:action="@{'/files/' + ${file.id} + '/delete'}"
+                  class="d-inline"
                   onsubmit="return confirm('정말 삭제하시겠습니까?')">
-              <input type="hidden" name="postId" th:value="${post.id}">
-              <button type="submit" class="btn btn-sm btn-outline-danger">
-                <i class="fas fa-trash me-1"></i>삭제
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <input type="hidden" name="postId" th:value="${post.id}" />
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i>
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- 댓글 섹션 -->
-  <div class="card">
-    <div class="card-header">
-      <h5 class="mb-0">
-        <i class="fas fa-comments me-2"></i>
-        댓글 <span class="badge bg-secondary" th:text="${#lists.size(comments)}">0</span>
-      </h5>
-    </div>
-    <div class="card-body">
-      <!-- 댓글 목록 -->
-      <div th:if="${comments != null and not #lists.isEmpty(comments)}" class="mb-4">
-        <div th:each="comment : ${comments}" class="border-bottom pb-3 mb-3">
-          <div class="d-flex justify-content-between align-items-start">
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-center mb-2">
-                <strong th:text="${comment.author.realName}">작성자</strong>
-                <small class="text-muted ms-2">
-                  <span th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">작성시간</span>
-                  <span th:if="${comment.updatedAt != null}"> (수정됨)</span>
-                </small>
+    <!-- 댓글 섹션 -->
+    <div class="comments-section">
+      <div class="comments-header">
+        <h4>
+          <i class="fas fa-comments me-2"></i>
+          댓글 <span th:text="${comments != null ? #lists.size(comments) : 0}">0</span>개
+        </h4>
+      </div>
+      <div class="comments-body">
+        <!-- 댓글 목록 -->
+        <div th:if="${comments != null and !#lists.isEmpty(comments)}">
+          <div th:each="comment : ${comments}" class="comment-item">
+            <div class="comment-header">
+              <div class="comment-author">
+                <div class="comment-avatar" th:text="${#strings.substring(comment.author.realName, 0, 1)}">A</div>
+                <div>
+                  <strong th:text="${comment.author.realName}">작성자</strong>
+                  <div class="text-muted small" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">작성시간</div>
+                  <span th:if="${comment.updatedAt != null}" class="text-muted small">(수정됨)</span>
+                </div>
               </div>
-              <p class="mb-0" th:utext="${#strings.replace(comment.content, T(java.lang.System).lineSeparator(), '&lt;br&gt;')}">
-                댓글 내용
-              </p>
+              <div class="comment-actions" th:if="${comment.author.username == #authentication.name}">
+                <button type="button" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <form method="post"
+                      th:action="@{'/comments/' + ${comment.id} + '/delete'}"
+                      class="d-inline"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <input type="hidden" name="postId" th:value="${post.id}" />
+                  <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </div>
             </div>
-            <div th:if="${comment.author.username == #authentication.principal.username or #authorization.expression('hasRole(''ADMIN'')')}" class="dropdown">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                <i class="fas fa-ellipsis-h"></i>
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <form th:action="@{/comments/{id}/delete(id=${comment.id})}" method="post" class="d-inline"
-                        onsubmit="return confirm('정말 삭제하시겠습니까?')">
-                    <input type="hidden" name="postId" th:value="${post.id}">
-                    <button type="submit" class="dropdown-item text-danger">
-                      <i class="fas fa-trash me-2"></i>삭제
-                    </button>
-                  </form>
-                </li>
-              </ul>
-            </div>
+            <div class="comment-content" th:text="${comment.content}">댓글 내용</div>
           </div>
         </div>
-      </div>
 
-      <!-- 댓글 작성 폼 -->
-      <form th:action="@{/comments/create}" th:object="${newComment}" method="post">
-        <input type="hidden" name="postId" th:value="${post.id}">
-        <div class="mb-3">
-          <label for="content" class="form-label">새 댓글</label>
-          <textarea class="form-control" id="content" th:field="*{content}" rows="3" placeholder="댓글을 입력하세요..." required></textarea>
+        <!-- 댓글이 없는 경우 -->
+        <div th:if="${comments == null or #lists.isEmpty(comments)}" class="empty-state">
+          <i class="fas fa-comment-slash"></i>
+          <h5>아직 댓글이 없습니다</h5>
+          <p>첫 번째 댓글을 작성해보세요!</p>
         </div>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-comment me-2"></i>댓글 작성
-        </button>
-      </form>
+
+        <!-- 새 댓글 작성 -->
+        <div class="comment-form">
+          <h5><i class="fas fa-pen me-2"></i>새 댓글</h5>
+          <form method="post" th:action="@{/comments/create}" th:object="${newComment}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" name="postId" th:value="${post.id}" />
+
+            <div class="mb-3">
+                                <textarea class="form-control"
+                                          th:field="*{content}"
+                                          placeholder="댓글을 입력하세요..."
+                                          required></textarea>
+            </div>
+
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>댓글 작성
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
-
-  <!-- 네비게이션 -->
-  <div class="mt-4">
-    <a href="/posts" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i>목록으로 돌아가기
-    </a>
-  </div>
 </div>
+
+<!-- Bootstrap 5.3 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 파일 제출 처리
+    const submissionFiles = document.getElementById('submissionFiles');
+    const selectedSubmissionFilesDiv = document.getElementById('selectedSubmissionFiles');
+
+    if (submissionFiles) {
+      submissionFiles.addEventListener('change', function() {
+        selectedSubmissionFilesDiv.innerHTML = '';
+
+        Array.from(this.files).forEach(file => {
+          const fileItem = document.createElement('div');
+          fileItem.className = 'file-item mt-3';
+          fileItem.innerHTML = `
+                            <div class="file-info">
+                                <div class="file-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="file-details">
+                                    <h6>${file.name}</h6>
+                                    <div class="file-size">${formatFileSize(file.size)}</div>
+                                </div>
+                            </div>
+                        `;
+          selectedSubmissionFilesDiv.appendChild(fileItem);
+        });
+      });
+    }
+
+    // 파일 크기 포맷팅
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // 댓글 자동 크기 조정
+    const commentTextarea = document.querySelector('.comment-form textarea');
+    if (commentTextarea) {
+      commentTextarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      });
+    }
+  });
+</script>
 </body>
 </html>
