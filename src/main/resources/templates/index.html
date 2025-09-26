@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,231 +31,60 @@
       --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
     }
 
-    * {
-      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    body {
-      background-color: var(--light-bg);
-      color: var(--dark-text);
-      line-height: 1.6;
-    }
+    * { font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background-color: var(--light-bg); color: var(--dark-text); line-height: 1.6; }
 
     /* 네비게이션 스타일 */
-    .navbar {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      box-shadow: var(--shadow-md);
-      padding: 1rem 0;
-    }
-
-    .navbar-brand {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: white !important;
-    }
-
-    .navbar-nav .nav-link {
-      color: rgba(255, 255, 255, 0.9) !important;
-      font-weight: 500;
-      margin: 0 0.5rem;
-      padding: 0.5rem 1rem !important;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-nav .nav-link:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white !important;
-    }
-
-    .navbar-nav .nav-link.active {
-      background-color: rgba(255, 255, 255, 0.2);
-      color: white !important;
-    }
-
-    .btn-logout {
-      background-color: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white !important;
-      font-size: 0.9rem;
-      padding: 0.4rem 1rem;
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    .btn-logout:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
-      color: white !important;
-    }
+    .navbar { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); box-shadow: var(--shadow-md); padding: 1rem 0; }
+    .navbar-brand { font-weight: 700; font-size: 1.5rem; color: white !important; }
+    .navbar-nav .nav-link { color: rgba(255, 255, 255, 0.9) !important; font-weight: 500; margin: 0 0.5rem; padding: 0.5rem 1rem !important; border-radius: 0.5rem; transition: all 0.3s ease; }
+    .navbar-nav .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); color: white !important; }
+    .navbar-nav .nav-link.active { background-color: rgba(255, 255, 255, 0.2); color: white !important; }
+    .btn-logout { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); color: white !important; font-size: 0.9rem; padding: 0.4rem 1rem; border-radius: 0.5rem; transition: all 0.3s ease; }
+    .btn-logout:hover { background-color: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.5); color: white !important; }
 
     /* 메인 컨텐츠 */
-    .main-content {
-      min-height: calc(100vh - 140px);
-      padding: 2rem 0;
-    }
+    .main-content { min-height: calc(100vh - 140px); padding: 2rem 0; }
 
     /* 카드 스타일 */
-    .card {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-md);
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      color: white;
-      border-radius: 1rem 1rem 0 0 !important;
-      border: none;
-      padding: 1.5rem;
-    }
-
-    .card-header h1, .card-header h2, .card-header h3, .card-header h4, .card-header h5, .card-header h6 {
-      margin: 0;
-      color: white;
-    }
-
-    .card-body {
-      padding: 2rem;
-    }
+    .card { border: none; border-radius: 1rem; box-shadow: var(--shadow-sm); transition: all 0.3s ease; }
+    .card:hover { box-shadow: var(--shadow-md); }
+    .card-header { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white; border-radius: 1rem 1rem 0 0 !important; border: none; padding: 1.5rem; }
+    .card-header h1, .card-header h2, .card-header h3, .card-header h4, .card-header h5, .card-header h6 { margin: 0; color: white; }
+    .card-body { padding: 2rem; }
 
     /* 버튼 스타일 */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
-      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .btn-outline-primary {
-      border: 2px solid var(--primary-color);
-      color: var(--primary-color);
-      background: transparent;
-      border-radius: 0.5rem;
-      padding: 0.75rem 2rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-      background: var(--primary-color);
-      border-color: var(--primary-color);
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); border: none; border-radius: 0.5rem; padding: 0.75rem 2rem; font-weight: 500; box-shadow: var(--shadow-sm); transition: all 0.3s ease; }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%); }
+    .btn-success { background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%); border: none; border-radius: 0.5rem; padding: 0.75rem 2rem; font-weight: 500; box-shadow: var(--shadow-sm); }
+    .btn-outline-primary { border: 2px solid var(--primary-color); color: var(--primary-color); background: transparent; border-radius: 0.5rem; padding: 0.75rem 2rem; font-weight: 500; transition: all 0.3s ease; }
+    .btn-outline-primary:hover { background: var(--primary-color); border-color: var(--primary-color); }
 
     /* 폼 스타일 */
-    .form-control, .form-select {
-      border: 2px solid var(--border-color);
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.1);
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: var(--dark-text);
-      margin-bottom: 0.5rem;
-    }
+    .form-control, .form-select { border: 2px solid var(--border-color); border-radius: 0.5rem; padding: 0.75rem 1rem; font-size: 1rem; transition: all 0.3s ease; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.1); }
+    .form-label { font-weight: 500; color: var(--dark-text); margin-bottom: 0.5rem; }
 
     /* 알림 스타일 */
-    .alert {
-      border: none;
-      border-radius: 0.5rem;
-      padding: 1rem 1.5rem;
-      font-weight: 500;
-    }
-
-    .alert-success {
-      background-color: #ECFDF5;
-      color: #065F46;
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .alert-danger {
-      background-color: #FEF2F2;
-      color: #991B1B;
-      border-left: 4px solid var(--danger-color);
-    }
-
-    .alert-info {
-      background-color: #F0F9FF;
-      color: #1E40AF;
-      border-left: 4px solid var(--info-color);
-    }
+    .alert { border: none; border-radius: 0.5rem; padding: 1rem 1.5rem; font-weight: 500; }
+    .alert-success { background-color: #ECFDF5; color: #065F46; border-left: 4px solid var(--secondary-color); }
+    .alert-danger { background-color: #FEF2F2; color: #991B1B; border-left: 4px solid var(--danger-color); }
+    .alert-info { background-color: #F0F9FF; color: #1E40AF; border-left: 4px solid var(--info-color); }
 
     /* 푸터 스타일 */
-    .footer {
-      background-color: var(--dark-text);
-      color: white;
-      padding: 2rem 0;
-      margin-top: auto;
-    }
+    .footer { background-color: var(--dark-text); color: white; padding: 2rem 0; margin-top: auto; }
 
     /* 사용자 정보 드롭다운 */
-    .user-info {
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-    }
-
-    .dropdown-menu {
-      border: none;
-      border-radius: 0.5rem;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .dropdown-item {
-      padding: 0.75rem 1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .dropdown-item:hover {
-      background-color: var(--light-bg);
-      color: var(--primary-color);
-    }
+    .user-info { background-color: rgba(255, 255, 255, 0.1); border-radius: 0.5rem; padding: 0.5rem 1rem; }
+    .dropdown-menu { border: none; border-radius: 0.5rem; box-shadow: var(--shadow-lg); }
+    .dropdown-item { padding: 0.75rem 1rem; font-weight: 500; transition: all 0.3s ease; }
+    .dropdown-item:hover { background-color: var(--light-bg); color: var(--primary-color); }
 
     /* 반응형 */
     @media (max-width: 768px) {
-      .main-content {
-        padding: 1rem 0;
-      }
-
-      .card-body {
-        padding: 1.5rem;
-      }
-
-      .navbar-brand {
-        font-size: 1.2rem;
-      }
+      .main-content { padding: 1rem 0; }
+      .card-body { padding: 1.5rem; }
+      .navbar-brand { font-size: 1.2rem; }
     }
   </style>
 </head>
@@ -261,7 +92,7 @@
 <!-- 네비게이션 -->
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container">
-    <a class="navbar-brand" href="/" th:href="@{/}">
+    <a class="navbar-brand" th:href="@{/}">
       <i class="fas fa-graduation-cap me-2"></i>과제 제출 시스템
     </a>
 
@@ -362,7 +193,24 @@
 <!-- 메인 컨텐츠 -->
 <main class="main-content">
   <div class="container">
-    <div th:replace="${content}">콘텐츠가 여기에 표시됩니다.</div>
+    <!-- content가 있을 때만 조립 -->
+    <th:block th:if="${content != null}">
+      <div th:replace="${content}"></div>
+    </th:block>
+
+    <!-- content가 없을 때 기본 콘텐츠 -->
+    <th:block th:if="${content == null}">
+      <div class="card">
+        <div class="card-header"><h5 class="mb-0">환영합니다</h5></div>
+        <div class="card-body">
+          <p class="mb-3">효율적인 과제 관리와 제출을 위한 통합 플랫폼입니다.</p>
+          <div class="d-flex gap-2">
+            <a class="btn btn-primary" th:href="@{/posts}"><i class="fas fa-list-alt me-1"></i>게시글 보기</a>
+            <a class="btn btn-outline-primary" th:href="@{/login}"><i class="fas fa-sign-in-alt me-1"></i>로그인</a>
+          </div>
+        </div>
+      </div>
+    </th:block>
   </div>
 </main>
 
@@ -398,10 +246,10 @@
     });
   });
 
-  // 폼 제출 확인
+  // 폼 제출 확인 (삭제 확인)
   document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('form[onsubmit*="confirm"]');
-    deleteButtons.forEach(function(form) {
+    const deleteForms = document.querySelectorAll('form[onsubmit*="confirm"]');
+    deleteForms.forEach(function(form) {
       form.addEventListener('submit', function(e) {
         if (!confirm('정말 삭제하시겠습니까?')) {
           e.preventDefault();
@@ -411,7 +259,7 @@
   });
 </script>
 
-<!-- 추가 스크립트 블록 -->
-<th:block th:replace="${scripts}"></th:block>
+<!-- 추가 스크립트 블록: scripts 있을 때만 조립 -->
+<th:block th:if="${scripts != null}" th:replace="${scripts}"></th:block>
 </body>
 </html>
